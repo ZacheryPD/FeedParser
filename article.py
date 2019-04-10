@@ -26,7 +26,7 @@ class Feed:
     def __str__(self):
         return "{} \n\t- link:{}\n\t- last_build_date: {}\n\t- {} article(s)".format(self.title, self.link, self.last_build_date, len(self.articles))
 
-class ArticleParserStrategy:
+class ArticleParser:
     def parse(self, xml_doc):
         article = Article()
 
@@ -37,7 +37,7 @@ class ArticleParserStrategy:
 
         return article
 
-class ImageParserStrategy:
+class ImageParser:
     def parse(self, xml_doc):
         image = Image()
 
@@ -47,12 +47,17 @@ class ImageParserStrategy:
 
         return image
 
-class FeedParserStrategy:
+class FeedParser:
+    def __init__(self, ):
+        self.image_parser = ImageParser()
+        self.article_parser = ArticleParser()
+
+
     def parse(self, xml_doc):
         feed = Feed()
 
-        feed.image = Image(xml_doc.find('image'))
-        feed.articles = [Article(article_doc) for article_doc in xml_doc.findall('item')]
+        feed.image = self.image_parser.parse(xml_doc.find('image'))
+        feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
 
         feed.link = xml_doc.find('link').text
         feed.last_build_date = xml_doc.find('lastBuildDate').text
