@@ -40,3 +40,13 @@
          def __str__(self):
              return "{} \n\t- link:{}\n\t- last_build_date: {}\n\t- {} article(s)".format(self.title, self.link, self.last_build_date, len(self.articles))
    #+END_SRC
+* Parsers
+  This RSS parser is designed to be a parser for RSS feeds, but I do also intend
+  to use it for some other feed types (atom, etc) in the future. To make that
+  easier, I am interested in setting things up in a way that I can reuse easily,
+  and I think the right way to do that for right now is to use something like a
+  strategy pattern where every parser knows how to resolve some part of the
+  feed. In the future, it may be worthwhile to make the parsers here strategies
+  in a true strategy pattern and have the system somehow intelligently determine
+  what kind of a feed we are dealing with.
+** Image parser
