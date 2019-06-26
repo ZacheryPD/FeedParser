@@ -50,3 +50,15 @@
   in a true strategy pattern and have the system somehow intelligently determine
   what kind of a feed we are dealing with.
 ** Image parser
+   #+BEGIN_SRC python :tangle SimpleRSS.py
+     class ArticleParser:
+         def parse(self, xml_doc):
+             article = Article()
+
+             article.description = xml_doc.find("description").text
+             article.title = xml_doc.find("title").text
+             article.url = xml_doc.find("link").text
+             article.published_date = xml_doc.find("pubDate").text
+
+             return article
+   #+END_SRC
