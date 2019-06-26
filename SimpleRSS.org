@@ -1,0 +1,42 @@
+* Background
+* Basic types
+** Article Type
+   The basic unit of the RSS feed is the article. The article consists of a
+   description, URL, title, and a date. This is passed around inside of feed
+   objects.
+   #+BEGIN_SRC python :tangle SimpleRSS.py
+     class Article:
+         def __init__(self):
+             self.description = ""
+             self.url = ""
+             self.title = ""
+             self.published_date = ""
+
+         def __str__(self):
+             return "title: {}\n\tdescription: {}\n\tlink: {}\n\tpublished_date: {}".format(self.title, self.description, self.url, self.published_date)
+   #+END_SRC
+** Image type
+   The image type is the XML object that contains the feed's favicon URL & title.
+   #+BEGIN_SRC python :tangle SimpleRSS.py
+     class Image:
+        def __init__(self):
+           self.title = ""
+           self.url = ""
+           self.link = ""
+   #+END_SRC
+** Feed type
+   The feed type is the thing that will be parsed out of an XML document overall. It consists of articles, etc
+
+   #+BEGIN_SRC python :tangle SimpleRSS.py
+     class Feed:
+         def __init__(self):
+             self.image = Image()
+             self.articles = []
+
+             self.link = ""
+             self.last_build_date = ""
+             self.title = ""
+
+         def __str__(self):
+             return "{} \n\t- link:{}\n\t- last_build_date: {}\n\t- {} article(s)".format(self.title, self.link, self.last_build_date, len(self.articles))
+   #+END_SRC
