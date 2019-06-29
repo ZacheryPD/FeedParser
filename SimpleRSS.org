@@ -1,4 +1,23 @@
 * Background
+** What is RSS?
+   RSS stands for Really Simple Syndication and it is an open standard for
+   reading news on the web.  In essence, it is a standardized format that
+   web sites can use to publish their content so that people can write apps to
+   read them.  That is exactly the aim of this project.
+
+*** RSS Specification
+    Information about the RSS spec can be found [[http://www.rssboard.org/rss-specification][here]].
+
+** Unit Testing
+   I have opted to unit test and keep all the code in this one org file for now.
+   I will probably look into changing that in the future.  
+
+   The testing is done using the default 'unittest' library in python3+.  In
+   order to take the most advantage of the literate programming style, I have
+   opted to separate out each use case into its own code block and attempt to
+   document them as I go.  I am unsure if that is going to make the code file
+   massive and incomprehensible, or make the tangling process too difficult to
+   manage, but I think most of it will be somewhat set-and-forget.
 * Basic types
 ** Article Type
    The basic unit of the RSS feed is the article. The article consists of a
@@ -50,6 +69,7 @@
   in a true strategy pattern and have the system somehow intelligently determine
   what kind of a feed we are dealing with.
 ** Article parser 
+   In the RSS specification, articles are called "items" [[http://www.rssboard.org/rss-specification#hrelementsOfLtitemgt][source]].
    #+BEGIN_SRC python :tangle SimpleRSS.py
      class ArticleParser:
          def parse(self, xml_doc):
@@ -62,6 +82,38 @@
 
              return article
    #+END_SRC
+*** Unit Tests
+    I have opted to write a separate test case for each object, and to write
+    individual functions for each "test case".  We use the ElementTree library
+    to parse, our XML object, so our tests need a reference to create the
+    'xml_doc' which we can use.
+
+    #+BEGIN_SRC python :tangle SimpleRSSTests.py
+     import unittest
+     import xml.etree.ElementTree as ET
+
+     from SimpleRSS import ArticleParser
+
+     class TestArticleParsing(unittest.TestCase):
+    #+END_SRC 
+**** Description
+     Every RSS article should have a description of some form or fashion.  This
+     is required in the spec mentioned in section [[*Unit Tests][Unit Tests]].
+    #+BEGIN_SRC python :tangle SimpleRSSTests.py
+          def test_description_exists(self):
+              xml_string = """"""
+              xml_document = ET.fromstring(xml_string)
+
+              article_parser = ArticleParser()
+
+              article = article_parser.parse(xml_document)
+
+              self.assertIsNotNone(article.description)
+
+
+
+
+    #+END_SRC 
 ** Image Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
      class ImageParser:
@@ -75,7 +127,7 @@
              return image
    #+END_SRC
 ** Feed Parser
-  #+BEGIN_SRC python :tangle SimpleRSS.py
+   #+BEGIN_SRC python :tangle SimpleRSS.py
     class FeedParser:
         def __init__(self, ):
             self.image_parser = ImageParser()
@@ -93,4 +145,19 @@
             feed.title = xml_doc.find('title').text
 
             return feed
-  #+END_SRC 
+   #+END_SRC 
+
+** Cleanup
+   Below are the final things we have to add to files to get them to tangle
+   properly.  Things like calling main() methods, etc.  
+*** Unit testing cleanup
+    In order to get unit tests running when you run a file, I need to get the
+    main method to be called.
+
+    #+BEGIN_SRC python :tangle SimpleRSSTests.py
+     if __name__ == '__main__':
+         unittest.main()
+
+    #+END_SRC 
+
+    #  LocalWords:  unittest org
