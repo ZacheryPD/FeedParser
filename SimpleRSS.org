@@ -88,27 +88,28 @@
     to parse, our XML object, so our tests need a reference to create the
     'xml_doc' which we can use.
 
-    #+BEGIN_SRC python :tangle SimpleRSSTests.py
-     import unittest
-     import xml.etree.ElementTree as ET
+    #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
+      import unittest
+      import xml.etree.ElementTree as ET
 
-     from SimpleRSS import ArticleParser
+      from SimpleRSS import ArticleParser
 
-     class TestArticleParsing(unittest.TestCase):
+      class TestArticleParsing(unittest.TestCase):
+          <<description-test>>
     #+END_SRC 
 **** Description
      Every RSS article should have a description of some form or fashion.  This
      is required in the spec mentioned in section [[*Unit Tests][Unit Tests]].
-    #+BEGIN_SRC python :tangle SimpleRSSTests.py
-          def test_description_exists(self):
-              xml_string = """"""
-              xml_document = ET.fromstring(xml_string)
+    #+BEGIN_SRC python :noexport :noweb-ref description-test
+      def test_description_exists(self):
+          xml_string = """"""
+          xml_document = ET.fromstring(xml_string)
 
-              article_parser = ArticleParser()
+          article_parser = ArticleParser()
 
-              article = article_parser.parse(xml_document)
+          article = article_parser.parse(xml_document)
 
-              self.assertIsNotNone(article.description)
+          self.assertIsNotNone(article.description)
 
 
 
