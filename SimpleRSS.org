@@ -1,4 +1,5 @@
 * Background
+
 ** What is RSS?
    RSS stands for Really Simple Syndication and it is an open standard for
    reading news on the web.  In essence, it is a standardized format that
@@ -7,7 +8,15 @@
 
 *** RSS Specification
     Information about the RSS spec can be found [[http://www.rssboard.org/rss-specification][here]].
-
+** Literate Programming
+   Literate programming is a technique pioneered by [[https://en.wikipedia.org/wiki/Donald_Knuth#Literate_programming][Donald Knuth]]. This project
+   is my first attempt at literate programming.  The stack I've chosen is
+   [[https://orgmode.org][org-mode]] (obviously) using [[https://orgmode.org/manual/Noweb-Reference-Syntax.html#Noweb-Reference-Syntax][noweb]]. Effectively, this document which describes
+   the project also contains interspersed throughout snippets of code, and
+   through a process called "tangling" that code is exported into *.py files
+   which then make up the actual project.  In this way, I am organizing code and
+   documentation together in one place.  Hopefully this will make the code
+   easier to understand in the long run.  
 ** Unit Testing
    I have opted to unit test and keep all the code in this one org file for now.
    I will probably look into changing that in the future.  
