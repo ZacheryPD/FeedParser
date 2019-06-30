@@ -96,6 +96,8 @@
 
       class TestArticleParsing(unittest.TestCase):
           <<description-test>>
+
+      <<main-method-call>>
     #+END_SRC 
 **** Description
      Every RSS article should have a description of some form or fashion.  This
@@ -110,11 +112,20 @@
           article = article_parser.parse(xml_document)
 
           self.assertIsNotNone(article.description)
-
-
-
-
     #+END_SRC 
+
+**** Cleanup
+     Below are the final things we have to add to files to get them to tangle
+     properly.  Things like calling main() methods, etc.  
+***** Unit testing cleanup
+      In order to get unit tests running when you run a file, I need to get the
+      main method to be called.
+
+      #+BEGIN_SRC python :noexport :noweb-ref main-method-call
+       if __name__ == '__main__':
+           unittest.main()
+
+      #+END_SRC 
 ** Image Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
      class ImageParser:
@@ -148,17 +159,5 @@
             return feed
    #+END_SRC 
 
-** Cleanup
-   Below are the final things we have to add to files to get them to tangle
-   properly.  Things like calling main() methods, etc.  
-*** Unit testing cleanup
-    In order to get unit tests running when you run a file, I need to get the
-    main method to be called.
-
-    #+BEGIN_SRC python :tangle SimpleRSSTests.py
-     if __name__ == '__main__':
-         unittest.main()
-
-    #+END_SRC 
 
     #  LocalWords:  unittest org
