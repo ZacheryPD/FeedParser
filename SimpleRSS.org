@@ -104,25 +104,53 @@
       from SimpleRSS import ArticleParser
 
       class TestArticleParsing(unittest.TestCase):
-          <<description-test>>
+          <<description-exists-test>>
+
+          <<title-exists-test>>
 
       <<main-method-call>>
     #+END_SRC 
 **** Description
      Every RSS article should have a description of some form or fashion.  This
      is required in the spec mentioned in section [[*Unit Tests][Unit Tests]].
-    #+BEGIN_SRC python :noexport :noweb-ref description-test
+     #+BEGIN_SRC python :noexport :noweb-ref description-exists-test
       def test_description_exists(self):
-          xml_string = """"""
+          xml_string = """
+          <item>
+              <title>Star City</title>
+              <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
+              <description>How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's &lt;a href="http://howe.iki.rssi.ru/GCTC/gctc_e.htm"&gt;Star City&lt;/a&gt;.</description>
+              <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+              <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
+          </item>"""
           xml_document = ET.fromstring(xml_string)
 
           article_parser = ArticleParser()
 
           article = article_parser.parse(xml_document)
 
-          self.assertIsNotNone(article.description)
-    #+END_SRC 
+          self.assertEqual(article.description, """How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's <a href="http://howe.iki.rssi.ru/GCTC/gctc_e.htm">Star City</a>.""")
+     #+END_SRC 
+**** Title
+     Every RSS article is required to have a title, per the RSS 2.0 spec.
+     #+BEGIN_SRC python :noexport :noweb-ref title-exists-test
+       def test_title_exists(self):
+           xml_string = """
+           <item>
+               <title>Star City</title>
+               <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
+               <description>How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's &lt;a href="http://howe.iki.rssi.ru/GCTC/gctc_e.htm"&gt;Star City&lt;/a&gt;.</description>
+               <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+               <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
+           </item>"""
+           xml_document = ET.fromstring(xml_string)
 
+           article_parser = ArticleParser()
+
+           article = article_parser.parse(xml_document)
+
+           self.assertEqual(article.title, "Star City")
+     #+END_SRC 
 **** Cleanup
      Below are the final things we have to add to files to get them to tangle
      properly.  Things like calling main() methods, etc.  
@@ -169,4 +197,4 @@
    #+END_SRC 
 
 
-    #  LocalWords:  unittest org
+   #  LocalWords:  unittest org
