@@ -107,7 +107,10 @@
           <<description-exists-test>>
 
           <<title-exists-test>>
+
           <<url-exists-test>>
+
+          <<published-date-exists-test>>
 
       <<main-method-call>>
     #+END_SRC 
@@ -152,11 +155,11 @@
 
            self.assertEqual(article.title, "Star City")
      #+END_SRC 
-**** url
+**** URL
      Each RSS "item" entry must contain a "link" element which contains a link
      to the article being referenced.
      #+BEGIN_SRC python :noexport :noweb-ref url-exists-test
-       def test_title_exists(self):
+       def test_url_exists(self):
            xml_string = """
            <item>
                <title>Star City</title>
@@ -172,6 +175,25 @@
            article = article_parser.parse(xml_document)
 
            self.assertEqual(article.url, "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp")
+     #+END_SRC 
+**** Published Date
+     #+BEGIN_SRC python :noexport :noweb-ref published-date-exists-test
+       def test_published_date_exists(self):
+           xml_string = """
+           <item>
+               <title>Star City</title>
+               <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
+               <description>How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's &lt;a href="http://howe.iki.rssi.ru/GCTC/gctc_e.htm"&gt;Star City&lt;/a&gt;.</description>
+               <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+               <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
+           </item>"""
+           xml_document = ET.fromstring(xml_string)
+
+           article_parser = ArticleParser()
+
+           article = article_parser.parse(xml_document)
+
+           self.assertEqual(article.published-date, "Tue, 03 Jun 2003 09:39:21 GMT")
      #+END_SRC 
 **** Cleanup
      Below are the final things we have to add to files to get them to tangle
