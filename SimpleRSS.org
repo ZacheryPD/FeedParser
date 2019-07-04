@@ -32,6 +32,20 @@
    The basic unit of the RSS feed is the article. The article consists of a
    description, URL, title, and a date. This is passed around inside of feed
    objects.
+
+   The RSS "channel" element contains some number of "item" elements. Each
+   "item" is one article. Every item may have a number of different attributes,
+   all of which are optional. One of Title or Description MUST be filled out.
+   - description
+   - title
+   - link
+   - pubDate
+   - author
+   - category
+   - comments
+   - enclosure
+   - guid
+   - source 
    #+BEGIN_SRC python :tangle SimpleRSS.py
      class Article:
          def __init__(self):
