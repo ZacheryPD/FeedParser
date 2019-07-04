@@ -206,7 +206,7 @@
 
            article = article_parser.parse(xml_document)
 
-           self.assertEqual(article.published-date, "Tue, 03 Jun 2003 09:39:21 GMT")
+           self.assertEqual(article.published_date, "Tue, 03 Jun 2003 09:39:21 GMT")
      #+END_SRC 
 ** Image Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
