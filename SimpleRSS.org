@@ -112,9 +112,6 @@
     'xml_doc' which we can use.
 
     #+BEGIN_SRC python :noexport SimpleRSSTests.py :noweb yes :noweb-ref article-parser-tests
-      import unittest
-      import xml.etree.ElementTree as ET
-
       from SimpleRSS import ArticleParser
 
       class TestArticleParsing(unittest.TestCase):
@@ -220,6 +217,31 @@
 
              return image
    #+END_SRC
+*** Unit tests
+   #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-tests
+     from SimpleRSS import ImageParser
+     class TestImageParsing(unittest.TestCase):
+         <<image-parser-title-exists-test>>
+   #+END_SRC 
+
+**** Title
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-title-exists-test
+       def image_parser_title_exists_test(self):
+          xml_string = """
+            <image>
+              <url>https://www.w3schools.com/images/logo.gif</url>
+              <title>W3Schools.com</title>
+              <link>https://www.w3schools.com</link>
+            </image>
+          """
+          xml_document = ET.fromstring(xml_string)
+
+          article_parser = ArticleParser()
+
+          article = article_parser.parse(xml_document)
+
+          self.assertEqual(article.title, """W3Schools.com""")
+     #+END_SRC 
 ** Feed Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
     class FeedParser:
@@ -245,9 +267,14 @@
    #  LocalWords:  unittest org
 ** Unit Tests
   #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
-    <<article-parser-tests>>
+  import unittest
+  import xml.etree.ElementTree as ET
 
-    <<main-method-call>>
+  <<article-parser-tests>>
+
+  <<image-parser-tests>>
+
+  <<main-method-call>>
   #+END_SRC 
 **** Cleanup
      Below are the final things we have to add to files to get them to tangle
