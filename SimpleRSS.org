@@ -264,7 +264,6 @@
    #+END_SRC 
 
 
-   #  LocalWords:  unittest org
 ** Unit Tests
   #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
   import unittest
@@ -288,3 +287,5 @@
            unittest.main()
 
       #+END_SRC 
+
+   #  LocalWords:  unittest org
