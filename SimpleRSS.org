@@ -207,15 +207,15 @@
      #+END_SRC 
 ** Image Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
-     class ImageParser:
-         def parse(self, xml_doc):
-             image = Image()
+     class ImageParser():
+           def parse(self, xml_doc):
+                 image = Image()
 
-             image.title = xml_doc.find('title').text
-             image.url = xml_doc.find('url').text
-             image.link = xml_doc.find('link').text
+                 image.title = xml_doc.find('title').text
+                 image.url = xml_doc.find('url').text
+                 image.link = xml_doc.find('link').text
 
-             return image
+                 return image
    #+END_SRC
 *** Unit tests
    #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-tests
@@ -224,11 +224,13 @@
          <<image-parser-title-exists-test>>
 
          <<image-parser-url-exists-test>>
+
+         <<image-parser-link-exists-test>>
    #+END_SRC 
    
 **** Title
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-title-exists-test
-       def image_parser_title_exists_test(self):
+       def test_image_parser_title_exists(self):
           xml_string = """
             <image>
               <url>https://www.w3schools.com/images/logo.gif</url>
@@ -238,16 +240,16 @@
           """
           xml_document = ET.fromstring(xml_string)
 
-          article_parser = ArticleParser()
+          image_parser = ImageParser()
 
-          article = article_parser.parse(xml_document)
+          image = image_parser.parse(xml_document)
 
-          self.assertEqual(article.title, """W3Schools.com""")
+          self.assertEqual(image.title, """W3Schools.com""")
      #+END_SRC 
 
 **** Url 
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-url-exists-test
-       def image_parser_title_exists_test(self):
+       def test_image_parser_url_exists(self):
           xml_string = """
             <image>
               <url>https://www.w3schools.com/images/logo.gif</url>
@@ -257,11 +259,30 @@
           """
           xml_document = ET.fromstring(xml_string)
 
-          article_parser = ArticleParser()
+          image_parser = ImageParser()
 
-          article = article_parser.parse(xml_document)
+          image = image_parser.parse(xml_document)
 
-          self.assertEqual(article.url, """https://www.w3schools.com/images/logo.gif""")
+          self.assertEqual(image.url, """https://www.w3schools.com/images/logo.gif""")
+     #+END_SRC 
+
+**** Link 
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-link-exists-test
+       def test_image_parser_link_exists(self):
+          xml_string = """
+            <image>
+              <url>https://www.w3schools.com/images/logo.gif</url>
+              <title>W3Schools.com</title>
+              <link>https://www.w3schools.com</link>
+            </image>
+          """
+          xml_document = ET.fromstring(xml_string)
+
+          image_parser = ImageParser()
+
+          image = image_parser.parse(xml_document)
+
+          self.assertEqual(image.link, """https://www.w3schools.com""")
      #+END_SRC 
 ** Feed Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
