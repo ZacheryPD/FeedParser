@@ -222,8 +222,10 @@
      from SimpleRSS import ImageParser
      class TestImageParsing(unittest.TestCase):
          <<image-parser-title-exists-test>>
-   #+END_SRC 
 
+         <<image-parser-url-exists-test>>
+   #+END_SRC 
+   
 **** Title
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-title-exists-test
        def image_parser_title_exists_test(self):
@@ -241,6 +243,25 @@
           article = article_parser.parse(xml_document)
 
           self.assertEqual(article.title, """W3Schools.com""")
+     #+END_SRC 
+
+**** Url 
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-url-exists-test
+       def image_parser_title_exists_test(self):
+          xml_string = """
+            <image>
+              <url>https://www.w3schools.com/images/logo.gif</url>
+              <title>W3Schools.com</title>
+              <link>https://www.w3schools.com</link>
+            </image>
+          """
+          xml_document = ET.fromstring(xml_string)
+
+          article_parser = ArticleParser()
+
+          article = article_parser.parse(xml_document)
+
+          self.assertEqual(article.url, """https://www.w3schools.com/images/logo.gif""")
      #+END_SRC 
 ** Feed Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
@@ -263,7 +284,7 @@
             return feed
    #+END_SRC 
 
-
+   
 ** Unit Tests
   #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
   import unittest
