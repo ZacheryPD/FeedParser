@@ -218,7 +218,7 @@
                  return image
    #+END_SRC
 *** Unit tests
-   #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-tests
+    #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-tests
      from SimpleRSS import ImageParser
      class TestImageParsing(unittest.TestCase):
          <<image-parser-title-exists-test>>
@@ -226,7 +226,7 @@
          <<image-parser-url-exists-test>>
 
          <<image-parser-link-exists-test>>
-   #+END_SRC 
+    #+END_SRC 
    
 **** Title
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref image-parser-title-exists-test
@@ -305,18 +305,46 @@
             return feed
    #+END_SRC 
 
+*** Unit tests
+    #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-tests
+      from SimpleRSS import FeedParser 
+      class TestFeedParsing(unittest.TestCase):
+          <<feed-parser-link-exists-test>>
+    #+END_SRC 
+
+**** Link
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-link-exists-test
+       def test_feed_parser_link_exists(self):
+          xml_string = """
+          <channel>
+              <link>https://google.com</link>
+          </channel>
+          """
+          xml_document = ET.fromstring(xml_string)
+
+          feed_parser = FeedParser()
+
+          feed = feed_parser.parse(xml_document)
+
+          self.assertEqual(feed.link, """https://google.com""")
+     #+END_SRC 
+**** Articles
+**** Last build
+**** Title
    
 ** Unit Tests
-  #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
-  import unittest
-  import xml.etree.ElementTree as ET
+   #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
+     import unittest
+     import xml.etree.ElementTree as ET
 
-  <<article-parser-tests>>
+     <<article-parser-tests>>
 
-  <<image-parser-tests>>
+     <<image-parser-tests>>
 
-  <<main-method-call>>
-  #+END_SRC 
+     <<feed-parser-tests>>
+
+     <<main-method-call>>
+   #+END_SRC 
 **** Cleanup
      Below are the final things we have to add to files to get them to tangle
      properly.  Things like calling main() methods, etc.  
@@ -330,4 +358,5 @@
 
       #+END_SRC 
 
-   #  LocalWords:  unittest org
+      #  LocalWords:  unittest org
+   
