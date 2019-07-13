@@ -360,3 +360,11 @@
 
       #  LocalWords:  unittest org
    
+* Utilities
+** XML Parsing
+   We need some basic XML parsing functionality.  We need to isolate some of the XML functionality. 
+  #+BEGIN_SRC python :tangle :noweb yes
+    import xml.etree.ElementTree as ET
+
+    class xml_reader():
+  #+END_SRC 
