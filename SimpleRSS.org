@@ -287,20 +287,22 @@
 ** Feed Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
     class FeedParser:
-        def __init__(self, ):
+        def __init__(self):
             self.image_parser = ImageParser()
             self.article_parser = ArticleParser()
 
 
-        def parse(self, xml_doc):
+        def parse(self, xml_string):
+            xml_doc = xml_reader(xml_string = xml_string, xml_doc = None)
+            
             feed = Feed()
 
-            feed.image = self.image_parser.parse(xml_doc.find('image'))
-            feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
+            # feed.image = self.image_parser.parse(xml_doc.find('image'))
+            # feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
 
-            feed.link = xml_doc.find('link').text
-            feed.last_build_date = xml_doc.find('lastBuildDate').text
-            feed.title = xml_doc.find('title').text
+            feed.link = xml_doc.find_element_text('link')
+            feed.last_build_date = xml_doc.find_element_text('lastBuildDate')
+            feed.title = xml_doc.find_element_text('title')
 
             return feed
    #+END_SRC 
@@ -320,11 +322,9 @@
               <link>https://google.com</link>
           </channel>
           """
-          xml_document = ET.fromstring(xml_string)
-
           feed_parser = FeedParser()
 
-          feed = feed_parser.parse(xml_document)
+          feed = feed_parser.parse(xml_string)
 
           self.assertEqual(feed.link, """https://google.com""")
      #+END_SRC 
@@ -363,41 +363,55 @@
 * Utilities
 ** XML Parsing
    We need some basic XML parsing functionality.  We need to isolate some of the XML functionality. 
-  #+BEGIN_SRC python :tangle :noweb yes
+  #+BEGIN_SRC python :tangle SimpleRSS.py :noweb yes
     import xml.etree.ElementTree as ET
 
     class xml_reader():
-        <<xml-constructor>>
+        <<xml-construcor>>
 
-        <<xml-find-element>>
+        <<xml-find-element-text>>
 
         <<xml-get-xml-doc>>
+
+        <<xml-find-element>>
   #+END_SRC 
 
 *** Constructor
     It would be nice, for now, if the class could just hold its state internally and I could just call "try or get' attributes to grab elements off of the document.
-   #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-construcor
-     def __init__(self, xml_string):
+    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-construcor
+     def __init__(self, xml_string = None, xml_doc = None):
          self.xml_string = xml_string
          self.xml = None
-   #+END_SRC 
+
+         if xml_doc is not None:
+             self.xml = xml_doc
+
+    #+END_SRC 
 
 *** Parse method 
-    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element
+    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element-text
       def find_element_text(self, element_name):
-          element = self.get_xml_doc().find(element_name)
+          element = self.find_element(element_name)
 
           if(element is not None):
               return element.text
           else:
               return None
     #+END_SRC 
+*** Get Object Method
+    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element
+      def find_element(self, element_name):
+          element = self.get_xml_doc().find(element_name)
+
+          return element
+    #+END_SRC 
 *** Get an XML document method
     #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-get-xml-doc
-      def get_xml_doc(self, xml_string):
+      def get_xml_doc(self):
           if(self.xml is None):
               self.xml = ET.fromstring(self.xml_string)
 
 
           return self.xml
     #+END_SRC 
+    
