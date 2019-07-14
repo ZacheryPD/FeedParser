@@ -210,10 +210,11 @@
      class ImageParser():
            def parse(self, xml_doc):
                  image = Image()
+                 xml_doc = xml_reader(xml_doc = xml_doc)
 
-                 image.title = xml_doc.find('title').text
-                 image.url = xml_doc.find('url').text
-                 image.link = xml_doc.find('link').text
+                 image.title = xml_doc.find_element_text('title')
+                 image.url = xml_doc.find_element_text('url')
+                 image.link = xml_doc.find_element_text('link')
 
                  return image
    #+END_SRC
@@ -297,8 +298,8 @@
             
             feed = Feed()
 
-            # feed.image = self.image_parser.parse(xml_doc.find('image'))
-            # feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
+            feed.image = self.image_parser.parse(xml_doc.find_element('image'))
+            feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
 
             feed.link = xml_doc.find_element_text('link')
             feed.last_build_date = xml_doc.find_element_text('lastBuildDate')
@@ -401,6 +402,9 @@
 *** Get Object Method
     #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element
       def find_element(self, element_name):
+          if(self.get_xml_doc() is None):
+              return None
+
           element = self.get_xml_doc().find(element_name)
 
           return element
@@ -408,8 +412,9 @@
 *** Get an XML document method
     #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-get-xml-doc
       def get_xml_doc(self):
-          if(self.xml is None):
+          if(self.xml is None and self.xml_string is not None):
               self.xml = ET.fromstring(self.xml_string)
+
 
 
           return self.xml
