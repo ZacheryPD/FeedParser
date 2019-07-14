@@ -367,4 +367,37 @@
     import xml.etree.ElementTree as ET
 
     class xml_reader():
+        <<xml-constructor>>
+
+        <<xml-find-element>>
+
+        <<xml-get-xml-doc>>
   #+END_SRC 
+
+*** Constructor
+    It would be nice, for now, if the class could just hold its state internally and I could just call "try or get' attributes to grab elements off of the document.
+   #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-construcor
+     def __init__(self, xml_string):
+         self.xml_string = xml_string
+         self.xml = None
+   #+END_SRC 
+
+*** Parse method 
+    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element
+      def find_element_text(self, element_name):
+          element = self.get_xml_doc().find(element_name)
+
+          if(element is not None):
+              return element.text
+          else:
+              return None
+    #+END_SRC 
+*** Get an XML document method
+    #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-get-xml-doc
+      def get_xml_doc(self, xml_string):
+          if(self.xml is None):
+              self.xml = ET.fromstring(self.xml_string)
+
+
+          return self.xml
+    #+END_SRC 
