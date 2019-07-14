@@ -97,11 +97,12 @@
      class ArticleParser:
          def parse(self, xml_doc):
              article = Article()
+             xml_doc = xml_reader(xml_doc = xml_doc)
 
-             article.description = xml_doc.find("description").text
-             article.title = xml_doc.find("title").text
-             article.url = xml_doc.find("link").text
-             article.published_date = xml_doc.find("pubDate").text
+             article.description = xml_doc.find_element_text("description")
+             article.title = xml_doc.find_element_text("title")
+             article.url = xml_doc.find_element_text("link")
+             article.published_date = xml_doc.find_element_text("pubDate")
 
              return article
    #+END_SRC
@@ -287,25 +288,28 @@
      #+END_SRC 
 ** Feed Parser
    #+BEGIN_SRC python :tangle SimpleRSS.py
-    class FeedParser:
-        def __init__(self):
-            self.image_parser = ImageParser()
-            self.article_parser = ArticleParser()
+     class FeedParser:
+         def __init__(self):
+             self.image_parser = ImageParser()
+             self.article_parser = ArticleParser()
 
 
-        def parse(self, xml_string):
-            xml_doc = xml_reader(xml_string = xml_string, xml_doc = None)
-            
-            feed = Feed()
+         def parse(self, xml_string):
+             xml_doc = xml_reader(xml_string = xml_string, xml_doc = None)
 
-            feed.image = self.image_parser.parse(xml_doc.find_element('image'))
-            feed.articles = [self.article_parser.parse(article_doc) for article_doc in xml_doc.findall('item')]
+             feed = Feed()
 
-            feed.link = xml_doc.find_element_text('link')
-            feed.last_build_date = xml_doc.find_element_text('lastBuildDate')
-            feed.title = xml_doc.find_element_text('title')
+             feed.image = self.image_parser.parse(xml_doc.find_element('image'))
 
-            return feed
+             articles = xml_doc.find_elements('item'):
+             if articles is not None:
+                 feed.articles = [self.article_parser.parse(article_doc) for article_doc in articles]
+
+             feed.link = xml_doc.find_element_text('link')
+             feed.last_build_date = xml_doc.find_element_text('lastBuildDate')
+             feed.title = xml_doc.find_element_text('title')
+
+             return feed
    #+END_SRC 
 
 *** Unit tests
@@ -398,6 +402,7 @@
               return element.text
           else:
               return None
+
     #+END_SRC 
 *** Get Object Method
     #+BEGIN_SRC python :tangle :noweb yes :noweb-ref xml-find-element
@@ -406,6 +411,14 @@
               return None
 
           element = self.get_xml_doc().find(element_name)
+
+          return element
+
+      def find_elements(self, element_name):
+          if(self.get_xml_doc() is None):
+              return None
+
+          element = self.get_xml_doc().findall(element_name)
 
           return element
     #+END_SRC 
@@ -419,4 +432,5 @@
 
           return self.xml
     #+END_SRC 
+    
     
