@@ -363,7 +363,6 @@
 
       #+END_SRC 
 
-      #  LocalWords:  unittest org
    
 * Utilities
 ** XML Parsing
@@ -434,3 +433,953 @@
     #+END_SRC 
     
     
+* Examples
+
+** NYT RSS Feed
+   The goal of this simple application is to serve as an example for those who
+   might want to create their own app using the library. It also serves as
+   something of an integration test for now, showing all the parts work together
+   properly.
+
+  #+BEGIN_SRC python :tangle SimpleRSSNYTExample.py
+    from SimpleRSS import FeedParser
+
+    def main():
+        xml_feed_string = """
+    <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyt="http://www.nytimes.com/namespaces/rss/2.0" version="2.0">
+      <channel>
+        <title>NYT &gt; Home Page</title>
+        <link>http://www.nytimes.com/pages/index.html?partner=rss&amp;emc=rss</link>
+        <atom:link rel="self" type="application/rss+xml" href="http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"/>
+        <description/>
+        <language>en-us</language>
+        <copyright>Copyright 2019  The New York Times Company</copyright>
+        <lastBuildDate>Thu, 28 Mar 2019 22:10:24 GMT </lastBuildDate>
+        <image>
+          <title>NYT &gt; Home Page</title>
+          <url>https://static01.nyt.com/images/misc/NYT_logo_rss_250x40.png</url>
+          <link>http://www.nytimes.com/pages/index.html?partner=rss&amp;emc=rss</link>
+        </image>
+        <item>
+          <title>New York Sues Sackler Family Members and Drug Distributors</title>
+          <link>https://www.nytimes.com/2019/03/28/health/new-york-lawsuit-opioids-sacklers-distributors.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/health/new-york-lawsuit-opioids-sacklers-distributors.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/health/new-york-lawsuit-opioids-sacklers-distributors.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/29/science/29OPIOIDS1/28OPIOIDS1b-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>New York Attorney General Letitia James at a press conference on Thursday. The suit seeks to recover the state&#x2019;s costs for unnecessary prescriptions and related health care expenses, as well as issue financial penalties.</media:description>
+          <media:credit>Timothy A. Clary/Agence France-Presse &#x2014; Getty Images</media:credit>
+          <description>The state&#x2019;s lawsuit offers detail on methods allegedly used to flood the market with opioids, fueling an epidemic.</description>
+          <dc:creator>RONI CARYN RABIN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 20:13:34 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">your-feed-science</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Suits and Litigation (Civil)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Pain-Relieving Drugs</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Opioids and Opiates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Drugs (Pharmaceuticals)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">OxyContin (Drug)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Sackler Family</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">James, Letitia</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Cardinal Health Inc</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">McKesson Corporation</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Purdue Pharma</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">AmerisourceBergen Corp</category>
+        </item>
+        <item>
+          <title>Wells Fargo Chief Executive Timothy Sloan Abruptly Steps Down</title>
+          <link>https://www.nytimes.com/2019/03/28/business/wells-fargo-timothy-sloan.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/business/wells-fargo-timothy-sloan.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/business/wells-fargo-timothy-sloan.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/business/28WELLS/merlin_151962681_37f58593-177b-4d7b-814d-d8de853084bf-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Timothy Sloan testified before the House Financial Services Committee on Capitol Hill earlier in March.<br/><br/></media:description>
+          <media:credit>Chip Somodevilla/Getty Images</media:credit>
+          <description>Mr. Sloan took over as C.E.O. in 2016 as the bank dealt with the fallout of a series of scandals. C. Allen Parker was named the interim chief executive.</description>
+          <dc:creator>DAVID ENRICH</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 20:53:04 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Appointments and Executive Changes</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Banking and Financial Institutions</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Sloan, Timothy J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Wells Fargo &amp; Company</category>
+        </item>
+        <item>
+          <title>Lyft Prices I.P.O. at $72 a Share, Marking Arrival of Gig Economy to Wall Street</title>
+          <link>https://www.nytimes.com/2019/03/28/technology/lyft-ipo.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/technology/lyft-ipo.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/technology/lyft-ipo.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/business/28LYFT/28LYFT-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Lyft&#x2019;s founders, John Zimmer, left, and Logan Green at the company&#x2019;s headquarters in San Francisco.</media:description>
+          <media:credit>Ramin Talaie for The New York Times</media:credit>
+          <description>Lyft&#x2019;s I.P.O. heralds a new generation of Silicon Valley darlings on the public markets. Uber, Pinterest and Slack are expected to follow.</description>
+          <dc:creator>MICHAEL J. de la MERCED and KATE CONGER</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:10:25 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Car Services and Livery Cabs</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Initial Public Offerings</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Stocks and Bonds</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Nasdaq Composite Index</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Lyft Inc</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Green, Logan</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Zimmer, John (1984- )</category>
+        </item>
+        <item>
+          <title>Mueller Report Exceeds 300 Pages, Raising Questions About Four-Page Summary</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/mueller-report-length.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/mueller-report-length.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/us/politics/mueller-report-length.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/29/us/politics/28dc-report/28dc-report-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>William P. Barr, the attorney general, delivered his summary of the special counsel investigation to Congress on Sunday.</media:description>
+          <media:credit>Sarah Silbiger/The New York Times</media:credit>
+          <description>The page count suggests the special counsel detailed his conclusions beyond Justice Department requirements. And it raises questions about what the attorney general might have left out of his summary.</description>
+          <dc:creator>NICHOLAS FANDOS, ADAM GOLDMAN and KATIE BENNER</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:47:22 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Special Prosecutors (Independent Counsel)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Federal Bureau of Investigation</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Barr, William P</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mueller, Robert S III</category>
+        </item>
+        <item>
+          <title>Demands for Adam Schiff&#x2019;s Head Highlight Chasm That Only Widened With Mueller&#x2019;s Conclusion</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/adam-schiff-resign.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/adam-schiff-resign.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/politics/adam-schiff-resign.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/us/politics/28dc-intel2/merlin_152728596_d085948e-a938-4ed2-a7d2-8f4fa858bc6d-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Representative K. Michael Conaway, Republican of Texas, left, confers with Representative Devin Nunes, the Intelligence Committee&#x2019;s former chairman.</media:description>
+          <media:credit>Erin Schaff/The New York Times</media:credit>
+          <description>Republicans on the Intelligence Committee called on its chairman, Representative Adam B. Schiff, to resign. He accused them of turning a blind eye to President Trump&#x2019;s wrongdoing.</description>
+          <dc:creator>NICHOLAS FANDOS</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:59:18 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Schiff, Adam B</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Cyberwarfare and Defense</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mueller, Robert S III</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Barr, William P</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Moscow (Russia)</category>
+        </item>
+        <item>
+          <title>Trump, in Abrupt Pivot, Says Funding for Special Olympics Will Continue</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/trump-special-olympics.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/trump-special-olympics.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/us/politics/trump-special-olympics.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/us/politics/28dc-olympics/28dc-olympics-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>The opening ceremony this month of the Special Olympics in Abu Dhabi.</media:description>
+          <media:credit>Karim Sahib/Agence France-Presse &#x2014; Getty Images</media:credit>
+          <description>The president&#x2019;s budget is highly unlikely to win approval in Congress, but the Special Olympics funding enjoys broad support among Republicans and Democrats.</description>
+          <dc:creator>MICHAEL TACKETT</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:47:22 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Federal Budget (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Special Olympics</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Republican Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+        </item>
+        <item>
+          <title>Supreme Court Refuses to Block Ban on Bump Stocks</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/supreme-court-bump-stocks.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/supreme-court-bump-stocks.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/politics/supreme-court-bump-stocks.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/us/politics/27dc-scotus-bump/27dc-scotus-bump-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>A bump stock installed on an AK-47. The devices were used by a gunman to massacre 58 people at a Las Vegas concert in 2017.</media:description>
+          <media:credit>George Frey/Getty Images</media:credit>
+          <description>Challengers said the Trump administration exceeded its authority in banning the devices, which the Justice Department has said helps transform semiautomatic weapons into fully automatic machine guns.</description>
+          <dc:creator>ADAM LIPTAK</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 18:59:15 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Gun Control</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Firearms</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Bureau of Alcohol, Tobacco, Firearms and Explosives</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Gun Owners of America</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Supreme Court (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Francisco, Noel J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Las Vegas (Nev)</category>
+        </item>
+        <item>
+          <title>Facebook Engages in Housing Discrimination With Its Ad Practices, U.S. Says</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/facebook-housing-discrimination.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/facebook-housing-discrimination.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/politics/facebook-housing-discrimination.html?partner=rss&amp;emc=rss"/>
+          <description>The Department of Housing and Urban Development sued the company for violating the federal Fair Housing Act by limiting who sees ads based on characteristics like race, religion and national origin.</description>
+          <dc:creator>KATIE BENNER, GLENN THRUSH and MIKE ISAAC</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 20:54:49 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Online Advertising</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Real Estate and Housing (Residential)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Advertising and Marketing</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Discrimination</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Fair Housing Act (1968)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Suits and Litigation (Civil)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Social Media</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Federal Aid (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Civil Rights and Liberties</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Facebook Inc</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Housing and Urban Development Department</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Justice Department</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Carson, Benjamin S</category>
+        </item>
+        <item>
+          <title>Pete Buttigieg (It&#x2019;s &#x2018;Boot-Edge-Edge&#x2019;) Is Making Waves in the 2020 Race</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/buttigieg-2020-president.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/buttigieg-2020-president.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/us/politics/buttigieg-2020-president.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/us/politics/27buttigieg1/27buttigieg1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Pete Buttigieg, the mayor of South Bend, Ind., greeted people after an event in Columbia, S.C., on Saturday.</media:description>
+          <media:credit>Swikar Patel for The New York Times</media:credit>
+          <description>Pete Buttigieg may have a challenging last name and an unconventional r&#xE9;sum&#xE9;. But he&#x2019;s drawing big crowds and has jumped to third place in a poll of Iowa voters.</description>
+          <dc:creator>TRIP GABRIEL</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:20:23 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2020</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Buttigieg, Pete (1982- )</category>
+        </item>
+        <item>
+          <title>Brexit, Brunei, Frogs: Your Friday Briefing</title>
+          <link>https://www.nytimes.com/2019/03/28/briefing/brexit-brunei-frogs.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/briefing/brexit-brunei-frogs.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/briefing/brexit-brunei-frogs.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/briefing/28asia-briefing-slide-YMTN/28asia-briefing-slide-YMTN-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Prime Minister Theresa May leaving 10 Downing Street on Wednesday.</media:description>
+          <media:credit>Alastair Grant/Associated Press</media:credit>
+          <description>Let us help your start your day.</description>
+          <dc:creator>ALISHA HARIDASANI GUPTA</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:31:21 GMT</pubDate>
+        </item>
+        <item>
+          <title>Oliver North Showed Republicans the Way Out</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/trump-russia-iran-contra.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/trump-russia-iran-contra.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/opinion/trump-russia-iran-contra.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28bouieWeb/28bouieWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>A television broadcast of Oliver North&#x2019;s 1987 congressional testimony during the Iran-contra hearings.</media:description>
+          <media:credit>Ruby Washington/The New York Times</media:credit>
+          <description>Belligerence, shamelessness and partisanship can take you far.</description>
+          <dc:creator>JAMELLE BOUIE</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 16:15:54 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Iran-Contra Affair</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Special Prosecutors (Independent Counsel)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Watergate Affair</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Republican Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Barr, William P</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Nixon, Richard Milhous</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Reagan, Ronald Wilson</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+        </item>
+        <item>
+          <title>Meghan Markle and My Tabloid Obsession</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/meghan-markle-and-my-tabloid-obsession.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/meghan-markle-and-my-tabloid-obsession.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/opinion/meghan-markle-and-my-tabloid-obsession.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <description>She&#x2019;s a Rorschach test for whoever happens to be reading and writing about her.</description>
+          <dc:creator>KAITLYN GREENIDGE</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:02:59 GMT</pubDate>
+        </item>
+        <item>
+          <title>G.O.P. Cruelty Is a Pre-existing Condition</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/trump-obamacare.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/trump-obamacare.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/trump-obamacare.html?partner=rss&amp;emc=rss"/>
+          <description>Republicans just won&#x2019;t stop trying to take away health care.</description>
+          <dc:creator>PAUL KRUGMAN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 20:27:46 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Patient Protection and Affordable Care Act (2010)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Health Insurance and Managed Care</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Republican Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2020</category>
+        </item>
+        <item>
+          <title>The Argument: Who Botched the Mueller Report?</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/the-argument-mueller-report-electoral-college.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/the-argument-mueller-report-electoral-college.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/the-argument-mueller-report-electoral-college.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28argument-twentyfour/28argument-twentyfour-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Robert Mueller, the special counsel, walking past the White House on Sunday.</media:description>
+          <media:credit>Cliff Owen/Associated Press</media:credit>
+          <description>And should we abolish the Electoral College?</description>
+          <dc:creator/>
+          <pubDate>Thu, 28 Mar 2019 09:00:02 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mueller, Robert S III</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Barr, William P</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Podcasts</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2016</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">News and News Media</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Electoral College</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Special Prosecutors (Independent Counsel)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Republican Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Taibbi, Matt</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Elections</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Warren, Elizabeth</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">States (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Voting and Voters</category>
+        </item>
+        <item>
+          <title>The People Who Won&#x2019;t Be Duped</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/algerian-people-protest-president-bouteflika-army.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/algerian-people-protest-president-bouteflika-army.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/algerian-people-protest-president-bouteflika-army.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28Belkaid-copy/28Belkaid-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>An Algerian draped in the national flag took part in a demonstration in Algiers against President Abdelaziz Bouteflika this month.</media:description>
+          <media:credit>Ryad Kramdi/Agence France-Presse &#x2014; Getty Images</media:credit>
+          <description>Algeria&#x2019;s army finally turns its back on the president. But the protesters want much more than that.</description>
+          <dc:creator>AKRAM BELKA&#xCF;D</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 16:47:07 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Demonstrations, Protests and Riots</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Defense and Military Forces</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bouteflika, Abdelaziz</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Algeria</category>
+        </item>
+        <item>
+          <title>Bad Times in Trumpville</title>
+          <link>https://www.nytimes.com/2019/03/27/opinion/republicans-health-care.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/opinion/republicans-health-care.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/27/opinion/republicans-health-care.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/opinion/27collinsWeb/27collinsWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Democrats were happy to shift the conversation to health care after the release of the findings in the Mueller report.</media:description>
+          <media:credit>Erin Schaff/The New York Times</media:credit>
+          <description>Our president messes up his own good news.</description>
+          <dc:creator>GAIL COLLINS</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 03:33:01 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Patient Protection and Affordable Care Act (2010)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Health Insurance and Managed Care</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+        </item>
+        <item>
+          <title>Is Trump Keyser S&#xF6;ze &#x2014; Or Inspector Clouseau?</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/trump-mueller-russia-report.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/trump-mueller-russia-report.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/trump-mueller-russia-report.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28stephensWeb/28stephensWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>President Trump speaking to the media after a summary of the Mueller report&#x2019;s findings was released.</media:description>
+          <media:credit>Tom Brenner for The New York Times</media:credit>
+          <description>Maybe the president brilliantly played the media. Or maybe we just played ourselves.</description>
+          <dc:creator>BRET STEPHENS</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 10:00:04 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Putin, Vladimir V</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mueller, Robert S III</category>
+        </item>
+        <item>
+          <title>The Implicit Punishment of Daring to Go to College When Poor</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/college-admissions.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/college-admissions.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/college-admissions.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28jem1/28jem1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Students on the Queens College campus.</media:description>
+          <media:credit>Damon Winter/The New York Times</media:credit>
+          <description>A documentary to be screened on Capitol Hill next month, in which I am featured, chronicles the experience of low-income students navigating college admissions.</description>
+          <dc:creator>ENOCH JEMMOTT</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 18:13:33 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Admissions Standards</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Financial Aid (Education)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Colleges and Universities</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Canarsie (Brooklyn, NY)</category>
+        </item>
+        <item>
+          <title>A Watchful Eye on Facebook&#x2019;s Advertising Practices</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/facebook-ad-discrimination-race.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/facebook-ad-discrimination-race.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/opinion/facebook-ad-discrimination-race.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28Sylvain/28Sylvain-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>In 2016 it was revealed that Facebook allowed advertisers to exclude users by race.</media:description>
+          <media:credit>Hero Images, via Getty Images</media:credit>
+          <description>Is the social media giant finally facing consequences for ads that discriminate?</description>
+          <dc:creator>OLIVIER SYLVAIN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 16:07:37 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Discrimination</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Online Advertising</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Social Media</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Facebook Inc</category>
+        </item>
+        <item>
+          <title>Be Thankful for Mueller&#x2019;s Timing</title>
+          <link>https://www.nytimes.com/2019/03/27/opinion/mueller-trump-obamacare.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/opinion/mueller-trump-obamacare.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/opinion/mueller-trump-obamacare.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/opinion/27blowWeb/27blowWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Robert Mueller, the special counsel, with his wife, Ann Standish, in Washington on Sunday.</media:description>
+          <media:credit>Tasos Katopodis/Getty Images</media:credit>
+          <description>Trump has no idea how to ride a win.</description>
+          <dc:creator>CHARLES M. BLOW</dc:creator>
+          <pubDate>Wed, 27 Mar 2019 23:00:30 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Russian Interference in 2016 US Elections and Ties to Trump Associates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2016</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2020</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Parkland, Fla, Shooting (2018)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Special Prosecutors (Independent Counsel)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Justice Department</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Barr, William P</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mueller, Robert S III</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+        </item>
+        <item>
+          <title>&#x2018;Extreme Partisan Gerrymandering Is a Real Problem,&#x2019; Says Kavanaugh. He&#x2019;s Right.</title>
+          <link>https://www.nytimes.com/2019/03/27/opinion/gerrymandering-supreme-court.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/opinion/gerrymandering-supreme-court.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/opinion/gerrymandering-supreme-court.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/opinion/27gerrymandering/27gerrymandering-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Justin Klanke</media:credit>
+          <description>The Supreme Court could make history by erecting a constitutional barrier to electoral maps that put party over country.</description>
+          <dc:creator>THE EDITORIAL BOARD</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 18:23:32 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Redistricting and Reapportionment</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Supreme Court (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Constitution (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">North Carolina</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Maryland</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">United States</category>
+        </item>
+        <item>
+          <title>A Dummy&#x2019;s Guide to Democratic Policy Proposals</title>
+          <link>https://www.nytimes.com/2019/03/27/opinion/democrats-2020.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/opinion/democrats-2020.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/27/opinion/democrats-2020.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/opinion/27kristofWeb/27kristofWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Cory Booker&#x2019;s proposal to reduce wealth gaps is one of many ideas being put forward by Democrats.</media:description>
+          <media:credit>John Locher/Associated Press</media:credit>
+          <description>Democrats are offering up a litany of exciting big ideas. Let&#x2019;s take a look.</description>
+          <dc:creator>NICHOLAS KRISTOF</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:53:01 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Economy</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Children and Childhood</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Child Abuse and Neglect</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Income Tax</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Corporate Taxes</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Inheritance and Estate Taxes</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Child Care</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Tax Credits, Deductions and Exemptions</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Rent Control and Stabilization</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Booker, Cory A</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Brown, Sherrod</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Sanders, Bernard</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Shaefer, H Luke (1978- )</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Warren, Elizabeth</category>
+        </item>
+        <item>
+          <title>The Flood of Court Cases That Threaten Abortion</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/abortion-supreme-court.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/abortion-supreme-court.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/abortion-supreme-court.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28greenhouseWeb/merlin_150356142_d4677fd6-d773-4cb3-a828-5c7ab3825f14-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Demonstrators gathered in front of the Supreme Court during the March for Life in January.</media:description>
+          <media:credit>Joshua Roberts/Reuters</media:credit>
+          <description>Republican presidents sought judges who could be counted on to oppose abortion. The voices of those judges come through clearly in cases now making their way to the Supreme Court.</description>
+          <dc:creator>LINDA GREENHOUSE</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 10:00:06 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Law and Legislation</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Abortion</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Birth Control and Family Planning</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">States (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Women's Rights</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Constitution (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Pregnancy and Childbirth</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">State Legislatures</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Guttmacher Institute</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Planned Parenthood Federation of America</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Supreme Court (US)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bush, George</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bush, George W</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Nixon, Richard Milhous</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+        </item>
+        <item>
+          <title>Do You Understand Elizabeth Warren&#x2019;s Plan for Fixing Big Tech?</title>
+          <link>https://www.nytimes.com/2019/03/28/opinion/tech-regulation.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/opinion/tech-regulation.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/opinion/tech-regulation.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/opinion/28hosanagar/28hosanagar-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Saul Gravy/Ikon Images, via Getty Images</media:credit>
+          <description>Politicians have lots of ideas for regulating big tech. Here&#x2019;s how to know which ones work.</description>
+          <dc:creator>KARTIK HOSANAGAR</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 15:49:25 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Regulation and Deregulation of Industry</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Consumer Protection</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Warren, Elizabeth</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">United States</category>
+        </item>
+        <item>
+          <title>Editorial Observer: Bagels and War Crimes</title>
+          <link>https://www.nytimes.com/2019/03/27/opinion/bagels-war-crimes-nazi-reimann.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/opinion/bagels-war-crimes-nazi-reimann.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/opinion/bagels-war-crimes-nazi-reimann.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/opinion/27bagelsWeb/27bagelsWeb-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>A spokesman, Peter Harf, apologized for the Reimann family&#x2019;s history.</media:description>
+          <media:credit>Stephanie F&#xFC;essenich</media:credit>
+          <description>An overdue apology offers a reminder that companies are responsible for past conduct.</description>
+          <dc:creator>BINYAMIN APPELBAUM</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 01:08:27 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Prisoners of War</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Holocaust and the Nazi Era</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">War Crimes, Genocide and Crimes Against Humanity</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Bild (Newspaper)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Keurig Green Mountain Inc</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Pret A Manger</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Snapple Beverage Corp</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Volkswagen AG</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Germany</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">United States</category>
+        </item>
+        <item>
+          <title>At 71, She&#x2019;s Never Felt Pain or Anxiety. Now Scientists Know Why.</title>
+          <link>https://www.nytimes.com/2019/03/28/health/woman-pain-anxiety.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/health/woman-pain-anxiety.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/health/woman-pain-anxiety.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/science/27xp-nopain2/27xp-nopain2-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Because she doesn&#x2019;t feel pain, Ms. Cameron burns herself quite frequently. The scars tend to go away quickly, she said, something else scientists are planning to investigate.</media:description>
+          <media:credit>Mary Turner for The New York Times</media:credit>
+          <description>Scientists discovered a previously unidentified genetic mutation in a Scottish woman. They hope it could lead to the development of new pain treatment.</description>
+          <dc:creator>HEATHER MURPHY</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:21:17 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Genetics and Heredity</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Opioids and Opiates</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Pain-Relieving Drugs</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Anxiety and Stress</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">University College London</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Scotland</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Jo Cameron</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">The British Journal of Anaesthesia</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Pain</category>
+        </item>
+        <item>
+          <title>Generation Z: Who They Are, in Their Own Words</title>
+          <link>https://www.nytimes.com/2019/03/28/us/gen-z-in-their-words.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/gen-z-in-their-words.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/gen-z-in-their-words.html?partner=rss&amp;emc=rss"/>
+          <description>They&#x2019;re the most diverse generation in American history, and they&#x2019;re celebrating their untraditional views on gender and identity.</description>
+          <dc:creator>DAN LEVIN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 18:21:29 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Generation Z</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Race and Ethnicity</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Census Bureau</category>
+        </item>
+        <item>
+          <title>French Raise a Glass to a Health Warning About Too Much Wine</title>
+          <link>https://www.nytimes.com/2019/03/28/world/europe/france-wine-health-warning.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/world/europe/france-wine-health-warning.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/world/europe/france-wine-health-warning.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/world/28wine-france/28wine-france-moth-v2.jpg" medium="image" height="151" width="151"/>
+          <media:description>Visitors tasting red wine last year in the Saint-Emilion region in southwestern France.<br/><br/></media:description>
+          <media:credit>Georges Gobet/Agence France-Presse &#x2014; Getty Images</media:credit>
+          <description>&#x2018;&#x2018;For your health, it&#x2019;s maximum two glasses a day, and not every day,&#x201D; the health agency said. France&#x2019;s response? Deafening silence.</description>
+          <dc:creator>ADAM NOSSITER</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:44:47 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Wines</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">France</category>
+        </item>
+        <item>
+          <title>Plastic Bags to Be Banned in New York State</title>
+          <link>https://www.nytimes.com/2019/03/28/nyregion/plastic-bag-ban-.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/nyregion/plastic-bag-ban-.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/nyregion/plastic-bag-ban-.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/nyregion/28plasticbag2/28plasticbag2-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Lawmakers in Albany have agreed to a statewide ban on most single-use plastic bags.</media:description>
+          <media:credit>Mary Altaffer/Associated Press</media:credit>
+          <description>State lawmakers and Gov. Andrew Cuomo have agreed to ban most single-use plastic bags; counties will have the option to impose a 5-cent paper-bag fee.</description>
+          <dc:creator>JESSE McKINLEY</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:52:16 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Plastic Bags</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Environment</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Cuomo, Andrew M</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">New York State</category>
+        </item>
+        <item>
+          <title>14 Officers Indicted on Assault or Cover-Up Charges in Beating of Black Men</title>
+          <link>https://www.nytimes.com/2019/03/28/us/springfield-police-black-men-fight-lawsuit.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/springfield-police-black-men-fight-lawsuit.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/springfield-police-black-men-fight-lawsuit.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/us/28springfield/28springfield-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Nathan Bill&#x2019;s Bar &amp; Restaurant in Springfield, Mass. Six off-duty police officers and the bar&#x2019;s owner are accused of assaulting four African-American patrons down the street from the bar.</media:description>
+          <media:credit>Charles Krupa/Associated Press</media:credit>
+          <description>Twelve current and two former officers are accused of beating four black men after a barroom dispute in Springfield, Mass., or participating in a cover-up of the assault.</description>
+          <dc:creator>ADEEL HASSAN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:59:39 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Police Brutality, Misconduct and Shootings</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Springfield (Mass)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Civil Rights and Liberties</category>
+        </item>
+        <item>
+          <title>Henry J. Stern, Whose Vast Urban Domain Was Green, Is Dead at 83</title>
+          <link>https://www.nytimes.com/2019/03/28/obituaries/henry-j-stern-dead.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/obituaries/henry-j-stern-dead.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/obituaries/henry-j-stern-dead.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/29/obituaries/28stern1/28stern1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Fred R. Conrad/The New York Times</media:credit>
+          <description>Only Robert Moses surpassed Mr. Stern, New York City&#x2019;s longtime parks commissioner, in ensuring that a teeming population had places to breathe.</description>
+          <dc:creator>ROBERT D. McFADDEN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 20:25:35 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Stern, Henry J</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Deaths (Obituaries)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Parks and Recreation Department (NYC)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Central Park (Manhattan, NY)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">New York City</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
+        </item>
+        <item>
+          <title>N.S.A. Contractor Arrested in Biggest Breach of U.S. Secrets Pleads Guilty</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/hal-martin-nsa-guilty-plea.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/hal-martin-nsa-guilty-plea.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/politics/hal-martin-nsa-guilty-plea.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/us/politics/28dc-nsa/merlin_144325224_841fcd4e-c019-4df1-afa1-d4933b0f079d-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>A former contractor who carried classified material out of the National Security Agency will likely draw a nine-year sentence.</media:description>
+          <media:credit>Sait Serkan Gurbuz/Reuters</media:credit>
+          <description>The contractor, Harold Martin, was arrested in 2016, but investigators never found evidence that he had shared stolen classified information with anyone.</description>
+          <dc:creator>SCOTT SHANE</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 22:07:54 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Surveillance of Citizens by Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Computer Security</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Robberies and Thefts</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Classified Information and State Secrets</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">National Security Agency</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Shadow Brokers</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Martin, Harold T III (1964- )</category>
+        </item>
+        <item>
+          <title>Weather Channel Is Sued Over Fatal Crash Involving Storm Chasers</title>
+          <link>https://www.nytimes.com/2019/03/28/us/weather-channel-lawsuit-storm-chasers.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/weather-channel-lawsuit-storm-chasers.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/us/weather-channel-lawsuit-storm-chasers.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2017/03/30/us/28xp-chasers/30xp-chasers-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Three people were killed in 2017 when their S.U.V.s collided near Spur, Tex. The mother of one of the men has filed a wrongful-death lawsuit against the Weather Channel, saying that it knew the two storm chasers in the other vehicle drove dangerously.</media:description>
+          <media:credit>Ellysa Gonzalez/Lubbock Avalanche-Journal, via Associated Press</media:credit>
+          <description>Corbin Jaeger was killed in 2017 when two storm chasers ran a stop sign at about 70 miles per hour, the lawsuit says. All three died in the crash.</description>
+          <dc:creator>MATT STEVENS</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 17:18:26 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Weather Channel</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Drunken and Reckless Driving</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Traffic Accidents and Safety</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Suits and Litigation (Civil)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Weather</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Tornadoes</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Texas</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Corbin Jaeger</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Randall D. Yarnall</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Kelley G. Williamson</category>
+        </item>
+        <item>
+          <title>No Roofs, No Roads, No Bread: Cyclone Causes Emergency in Southeastern Africa</title>
+          <link>https://www.nytimes.com/2019/03/25/world/africa/cyclone-idai-africa-mozambique-zimbabwe.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/25/world/africa/cyclone-idai-africa-mozambique-zimbabwe.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/25/world/africa/cyclone-idai-africa-mozambique-zimbabwe.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/25/world/25cyclone-photos1/25cyclone-photos1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Cyclone Idai triggered flooding across a wide swath of coastal Mozambique, washing away bridges, roads and homes, and leaving people stranded on the banks of a river in the village of John Segredo on Sunday.</media:description>
+          <media:credit>Mike Hutchings/Reuters</media:credit>
+          <description>Cyclone Idai brought punishing rains and winds to Mozambique, Zimbabwe and Malawi, causing a humanitarian crisis for three million people.</description>
+          <dc:creator/>
+          <pubDate>Thu, 28 Mar 2019 15:10:51 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Cyclones</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Floods</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Mozambique</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Zimbabwe</category>
+        </item>
+        <item>
+          <title>In Vulgar Diatribe, Cuomo Aide Calls 3 Female Lawmakers &#x2018;Idiots&#x2019;</title>
+          <link>https://www.nytimes.com/2019/03/28/nyregion/governor-cuomo-fundraiser-albany-budget.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/nyregion/governor-cuomo-fundraiser-albany-budget.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/nyregion/governor-cuomo-fundraiser-albany-budget.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/29/nyregion/29cuomo/28cuomo-moth-v2.jpg" medium="image" height="151" width="151"/>
+          <media:description>A recent fund-raiser held by Gov. Andrew M. Cuomo has led to scrutiny and criticism of the event, as well as intraparty hostility just ahead of New York&#x2019;s April 1 budget deadline.</media:description>
+          <media:credit>Stephanie Keith for The New York Times</media:credit>
+          <description>Democrats began an intraparty war in Albany, as a top aide to Gov. Andrew M. Cuomo used unusually explicit language to fire back at women who accused Mr. Cuomo of hypocrisy.</description>
+          <dc:creator>VIVIAN WANG</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 21:50:41 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Cuomo, Andrew M</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Niou, Yuh-Line</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biaggi, Alessandra</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Ramos, Jessica (1985- )</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Campaign Finance</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Budgets and Budgeting</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Lobbying and Lobbyists</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Democratic Party</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">New York State</category>
+        </item>
+        <item>
+          <title>Grindr Is Owned by a Chinese Firm, and the U.S. Is Trying to Force It to Sell</title>
+          <link>https://www.nytimes.com/2019/03/28/us/politics/grindr-china-national-security.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/politics/grindr-china-national-security.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/us/politics/grindr-china-national-security.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/us/politics/28dc-grindr/28dc-grindr-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Grindr, the gay dating app, is owned by a Chinese company.</media:description>
+          <media:credit>Leon Neal/Getty Images</media:credit>
+          <description>The Committee on Foreign Investment in the United States is forcing a Chinese company to sell its stake in Grindr, a gay dating app, over national security concerns.</description>
+          <dc:creator>DAVID E. SANGER</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 22:08:12 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Grindr.com</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Beijing Kunlun World Wide Technology Share Co Ltd</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computer Security</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Defense and Military Forces</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">United States Defense and Military Forces</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Foreign Investments</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Cyberwarfare and Defense</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Committee on Foreign Investment in the United States (CFIUS)</category>
+        </item>
+        <item>
+          <title>Congestion Pricing Could Generate Billions of Dollars, but Now the Suburbs Want a Piece</title>
+          <link>https://www.nytimes.com/2019/03/28/nyregion/congestion-pricing-new-york.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/nyregion/congestion-pricing-new-york.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/nyregion/congestion-pricing-new-york.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/nyregion/00nycongestion1/00nycongestion1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Long Island residents want fees from congestion pricing to be used to improve service on the Long Island Rail Road.</media:description>
+          <media:credit>Johnny Milano for The New York Times</media:credit>
+          <description>State legislators want some revenue from congestion fees to go to commuter trains that serve Long Island and the Hudson Valley.</description>
+          <dc:creator>WINNIE HU</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 17:10:19 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Commuting</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Transit Systems</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Roads and Traffic</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Subways</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Politics and Government</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Congestion Pricing</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Long Island Rail Road Co</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Metropolitan Transportation Authority</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Kaminsky, Todd D (1978- )</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Long Island (NY)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">New York City</category>
+        </item>
+        <item>
+          <title>How to Protect Your Smart Home From Hackers</title>
+          <link>https://www.nytimes.com/2019/03/27/smarter-living/wirecutter/how-to-protect-your-smart-home-from-hackers.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/smarter-living/wirecutter/how-to-protect-your-smart-home-from-hackers.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/27/smarter-living/wirecutter/how-to-protect-your-smart-home-from-hackers.html?partner=rss&amp;emc=rss"/>
+          <description>Smart home devices can make life more convenient, but may put you at risk of being hacked. Ensure your safety with a few simple measures.</description>
+          <dc:creator>RACHEL CERICOLA</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 15:42:51 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computer Security</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Cyberattacks and Hackers</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Home Appliances</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Privacy</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">your-feed-wirecutter</category>
+        </item>
+        <item>
+          <title>5 Cheap(ish) Things to Help Get Rid of Distractions</title>
+          <link>https://www.nytimes.com/2019/03/28/smarter-living/5-cheap-ish-things-to-help-get-rid-of-distractions.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/smarter-living/5-cheap-ish-things-to-help-get-rid-of-distractions.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/28/smarter-living/5-cheap-ish-things-to-help-get-rid-of-distractions.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/smarter-living/28sl-newsletter1/28sl-newsletter1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Gary Hershorn/Getty Images</media:credit>
+          <description>You and your phone need a break.</description>
+          <dc:creator>ANNA GOLDFARB</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 11:05:44 GMT</pubDate>
+        </item>
+        <item>
+          <title>Stop Letting Modern Distractions Steal Your Attention</title>
+          <link>https://www.nytimes.com/2019/03/26/smarter-living/stop-letting-modern-distractions-steal-your-attention.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/26/smarter-living/stop-letting-modern-distractions-steal-your-attention.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/26/smarter-living/stop-letting-modern-distractions-steal-your-attention.html?partner=rss&amp;emc=rss"/>
+          <description>Making yourself inaccessible from time to time is essential to boosting your focus.</description>
+          <dc:creator>ANNA GOLDFARB</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 00:01:12 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Creativity</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Brain</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Anxiety and Stress</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Productivity</category>
+        </item>
+        <item>
+          <title>&#x2018;Don&#x2019;t Succumb to the Fear&#x2019;: Women Share Travel Safety Tips</title>
+          <link>https://www.nytimes.com/2019/03/26/travel/safety-tips-female-solo-travel.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/26/travel/safety-tips-female-solo-travel.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/26/travel/safety-tips-female-solo-travel.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/26/travel/26travel-safety/26travel-safety-moth-v3.jpg" medium="image" height="151" width="151"/>
+          <media:description>Jessica Nabongo is on a quest to travel to every country in the world.</media:description>
+          <media:credit>Todd Heisler/The New York Times</media:credit>
+          <description>No woman is responsible for harassment or any other violent act against her. But experienced travelers and government agencies show how to travel as safely as possible.</description>
+          <dc:creator>TARIRO MZEZEWA and LELA MOORE</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 15:32:06 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Travel and Vacations</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Women and Girls</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Self-Defense</category>
+        </item>
+        <item>
+          <title>2019 M.L.B. Season Preview: Baseball Is Stuffed to Its Seams</title>
+          <link>https://www.nytimes.com/2019/03/27/sports/baseball/mlb-preview.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/sports/baseball/mlb-preview.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/sports/baseball/mlb-preview.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/28/sports/28KepnerPreview/28KepnerPreview-moth-v2.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Dale Crosby Close</media:credit>
+          <description>With better development and technology at every level of the game, teams can draw from a player pool that is bigger &#x2014; and cheaper &#x2014; than ever.</description>
+          <dc:creator>TYLER KEPNER</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 03:16:28 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Baseball</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Draft and Recruitment (Sports)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Free Agents (Sports)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Wages and Salaries</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Los Angeles Dodgers</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Houston Astros</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Major League Baseball</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Toronto Blue Jays</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Doolittle, Sean (1986- )</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Harper, Bryce (1992- )</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Machado, Manny</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Luhnow, Jeff</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Taillon, Jameson (1991- )</category>
+        </item>
+        <item>
+          <title>Review: &#x2018;Dumbo&#x2019; Goes Bonkers in Dreamland</title>
+          <link>https://www.nytimes.com/2019/03/27/movies/dumbo-review.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/movies/dumbo-review.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/movies/dumbo-review.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <description>Tim Burton takes this live-action remake of the 1941 Disney classic to his very own dark place. Michael Keaton, Danny DeVito and Eva Green help.</description>
+          <dc:creator>MANOHLA DARGIS</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 19:29:36 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Movies</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_ttl">Dumbo (Movie)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Burton, Tim</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Walt Disney Company</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">DeVito, Danny</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Farrell, Colin</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Keaton, Michael</category>
+        </item>
+        <item>
+          <title>Afro Emojis Don&#x2019;t Exist. These Women Want to Change That.</title>
+          <link>https://www.nytimes.com/2019/03/28/us/afro-emoji.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/us/afro-emoji.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/us/afro-emoji.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/style/27xp-afro/fileupload-1553705526409-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Variants of the Afro emoji that Rhianna Jones and Kerrilyn Gibson have proposed.</media:description>
+          <media:credit>Rhianna Jones</media:credit>
+          <description>&#x201C;I want to create a space where we can bring that big-hair energy and celebrate our roots in digital spaces,&#x201D; said one of the women behind a petition to add the emoji.</description>
+          <dc:creator>SANDRA E. GARCIA</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 12:20:39 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Hair</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Emojis and Emoticons</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Blacks</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Unicode Consortium</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Women and Girls</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Rhianna Jones</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Kerrilyn Gibson</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Standards and Standardization</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Cellular Telephones</category>
+        </item>
+        <item>
+          <title>The Hunt: Down by the Bay, in Brooklyn</title>
+          <link>https://www.nytimes.com/2019/03/28/realestate/down-by-the-bay-in-brooklyn.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/realestate/down-by-the-bay-in-brooklyn.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/realestate/down-by-the-bay-in-brooklyn.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/31/realestate/28Hunt-RedHook1/28Hunt-RedHook1-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Eliot Ferguson in his new townhouse in Red Hook, Brooklyn.</media:description>
+          <media:credit>Andrea Mohin/The New York Times</media:credit>
+          <description>A Manhattan transplant finds more serenity and space for his children in the waterfront neighborhood of Red Hook.</description>
+          <dc:creator>JOYCE COHEN</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 17:44:27 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Real Estate and Housing (Residential)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Brooklyn (NYC)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Red Hook (Brooklyn, NY)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Ikea</category>
+        </item>
+        <item>
+          <title>Field Notes: Why Wedding Expos Are Still a Thing</title>
+          <link>https://www.nytimes.com/2019/03/27/fashion/weddings/why-wedding-expos-are-still-a-thing.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/fashion/weddings/why-wedding-expos-are-still-a-thing.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/27/fashion/weddings/why-wedding-expos-are-still-a-thing.html?partner=rss&amp;emc=rss"/>
+          <description>Personal contacts, prizes and swag bags stuffed with freebies and discounts. You won&#x2019;t get that kind of instant gratification on Instagram, Zola and Etsy.</description>
+          <dc:creator>ALIX STRAUSS</dc:creator>
+          <pubDate>Wed, 27 Mar 2019 14:32:00 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Weddings and Engagements</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Conventions, Fairs and Trade Shows</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Luxury Goods and Services</category>
+        </item>
+        <item>
+          <title>&#x2018;Scotty&#x2019; the T. Rex Is the Heaviest Ever Found, Scientists Say</title>
+          <link>https://www.nytimes.com/2019/03/28/science/scotty-t-rex-fossil.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/28/science/scotty-t-rex-fossil.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/28/science/scotty-t-rex-fossil.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/science/27xp-trex/27xp-trex-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Dr W. Scott Persons looking at the skeleton of the Tyrannosaurus rex named Scotty at the T.rex Discovery Center in Eastend, Saskatchewan.<br/><br/></media:description>
+          <media:credit>Amanda Kelley/Agence France&#x2013;Getty Images</media:credit>
+          <description>The dinosaur, named Scotty, was excavated the Saskatchewan province of Canada in the 1990s. A recent study shows that it is the heaviest and oldest specimen of its kind.</description>
+          <dc:creator>LAURA M. HOLSON</dc:creator>
+          <pubDate>Thu, 28 Mar 2019 15:06:49 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_keyword">Tyrannosaurus rex</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Dinosaurs</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">University of Alberta</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Canada</category>
+        </item>
+        <item>
+          <title>Phys Ed: What Your Exercise Habits Might Say About How Long You&#x2019;ll Live</title>
+          <link>https://www.nytimes.com/2019/03/27/well/move/what-your-exercise-habits-might-say-about-how-long-youll-live.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/well/move/what-your-exercise-habits-might-say-about-how-long-youll-live.html</guid>
+          <atom:link rel="standout" href="https://www.nytimes.com/2019/03/27/well/move/what-your-exercise-habits-might-say-about-how-long-youll-live.html?partner=rss&amp;emc=rss"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/26/well/physed-longevity/physed-longevity-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description/>
+          <media:credit>Getty Images</media:credit>
+          <description>If people start to exercise in midlife, even if they have not worked out for years, they can rapidly gain most of the longevity benefits of working out.</description>
+          <dc:creator>GRETCHEN REYNOLDS</dc:creator>
+          <pubDate>Wed, 27 Mar 2019 09:00:01 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Athletics and Sports</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Longevity</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Exercise</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Heart</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/mdes">Deaths (Fatalities)</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Age, Chronological</category>
+        </item>
+        <item>
+          <title>Mammogram Centers Must Tell Women if They Have Dense Breasts, F.D.A. Proposes</title>
+          <link>https://www.nytimes.com/2019/03/27/health/mammogram-dense-breast-cancer.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/27/health/mammogram-dense-breast-cancer.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/27/health/mammogram-dense-breast-cancer.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <media:content url="https://static01.nyt.com/images/2019/03/27/science/27MAMMOGRAM/27MAMMOGRAM-moth.jpg" medium="image" height="151" width="151"/>
+          <media:description>Examining the mammogram of a patient with dense breast tissue at the University of California, Davis, Medical Center in Sacramento.</media:description>
+          <media:credit>Rich Pedroncelli/Associated Press</media:credit>
+          <description>A new rule would require mammogram providers to let women know if they have dense breast tissue, which can hide cancer from X-rays.</description>
+          <dc:creator>DENISE GRADY</dc:creator>
+          <pubDate>Wed, 27 Mar 2019 19:36:18 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Mammography</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org_all">Food and Drug Administration</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Breast Cancer</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">your-feed-science</category>
+        </item>
+        <item>
+          <title>Get Your Kids to Go to Sleep &#x2014; and Stay Asleep &#x2014; in the Same Room</title>
+          <link>https://www.nytimes.com/2019/03/25/parenting/siblings-sharing-a-room.html?partner=rss&amp;emc=rss</link>
+          <guid isPermaLink="true">https://www.nytimes.com/2019/03/25/parenting/siblings-sharing-a-room.html</guid>
+          <atom:link href="https://www.nytimes.com/2019/03/25/parenting/siblings-sharing-a-room.html?partner=rss&amp;emc=rss" rel="standout"/>
+          <description>Be consistent, get the timing right and, if you&#x2019;re desperate, have one kid camp out on a cot in your room.</description>
+          <dc:creator>CRAIG CANAPARI, M.D.</dc:creator>
+          <pubDate>Mon, 25 Mar 2019 19:22:32 GMT</pubDate>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Parenting</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Children and Childhood</category>
+          <category domain="http://www.nytimes.com/namespaces/keywords/des">Sleep</category>
+        </item>
+      </channel>
+    </rss>
+            """
+
+        parser = FeedParser()
+
+        feed = parser.parse(xml_feed_string)
+
+        print(str(feed))
+
+    if __name__ == '__main__':
+        main()
+  #+END_SRC 
+
+  #  LocalWords:  unittest org
