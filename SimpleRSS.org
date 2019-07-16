@@ -301,7 +301,7 @@
 
              feed.image = self.image_parser.parse(xml_doc.find_element('image'))
 
-             articles = xml_doc.find_elements('item'):
+             articles = xml_doc.find_elements('item')
              if articles is not None:
                  feed.articles = [self.article_parser.parse(article_doc) for article_doc in articles]
 
