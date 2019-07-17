@@ -313,21 +313,25 @@
 
              return feed
    #+END_SRC 
-
+   
 *** Feed Unit tests
     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-tests
       from SimpleRSS import FeedParser 
       class TestFeedParsing(unittest.TestCase):
           <<feed-parser-link-exists-test>>
+
+          <<feed-parser-last-build-exists-test>>
     #+END_SRC 
 
 **** Link
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-link-exists-test
        def test_feed_parser_link_exists(self):
           xml_string = """
-          <channel>
-              <link>https://google.com</link>
-          </channel>
+          <rss>
+            <channel>
+                <link>https://google.com</link>
+            </channel>
+          </rss>
           """
           feed_parser = FeedParser()
 
@@ -340,9 +344,11 @@
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-last-build-exists-test
        def test_feed_parser_last_build_exists(self):
           xml_string = """
-          <channel>
-              <lastBuildDate>01/01/19</lastBuildDate>
-          </channel>
+          <rss>
+            <channel>
+                <lastBuildDate>01/01/19</lastBuildDate>
+            </channel>
+          </rss>
           """
           feed_parser = FeedParser()
 
