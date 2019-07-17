@@ -296,6 +296,8 @@
 
          def parse(self, xml_string):
              xml_doc = xml_reader(xml_string = xml_string, xml_doc = None)
+             
+             xml_doc = xml_reader(xml_doc = xml_doc.find_element('channel'))
 
              feed = Feed()
 
@@ -434,7 +436,7 @@
     
     
 * Examples
-
+  
 ** NYT RSS Feed
    The goal of this simple application is to serve as an example for those who
    might want to create their own app using the library. It also serves as
