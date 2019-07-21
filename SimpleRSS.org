@@ -398,7 +398,6 @@
 
       #+END_SRC 
 
-   
 * Utilities
 ** XML Parsing
    We need some basic XML parsing functionality.  We need to isolate some of the XML functionality. 
@@ -466,7 +465,6 @@
 
           return self.xml
     #+END_SRC 
-    
     
 * Examples
   
