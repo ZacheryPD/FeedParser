@@ -313,21 +313,25 @@
 
              return feed
    #+END_SRC 
-
-*** Unit tests
+   
+*** Feed Unit tests
     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-tests
       from SimpleRSS import FeedParser 
       class TestFeedParsing(unittest.TestCase):
           <<feed-parser-link-exists-test>>
+
+          <<feed-parser-last-build-exists-test>>
     #+END_SRC 
 
 **** Link
      #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-link-exists-test
        def test_feed_parser_link_exists(self):
           xml_string = """
-          <channel>
-              <link>https://google.com</link>
-          </channel>
+          <rss>
+            <channel>
+                <link>https://google.com</link>
+            </channel>
+          </rss>
           """
           feed_parser = FeedParser()
 
@@ -335,11 +339,40 @@
 
           self.assertEqual(feed.link, """https://google.com""")
      #+END_SRC 
-**** Articles
 **** Last build
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-last-build-exists-test
+       def test_feed_parser_last_build_exists(self):
+          xml_string = """
+          <rss>
+            <channel>
+                <lastBuildDate>01/01/19</lastBuildDate>
+            </channel>
+          </rss>
+          """
+          feed_parser = FeedParser()
+
+          feed = feed_parser.parse(xml_string)
+
+          self.assertEqual(feed.last_build_date, """01/01/19""")
+     #+END_SRC 
 **** Title
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-title-exists-test
+       def test_feed_title_build_exists(self):
+          xml_string = """
+          <rss>
+            <channel>
+                <title>New York Times</title>
+            </channel>
+          </rss>
+          """
+          feed_parser = FeedParser()
+
+          feed = feed_parser.parse(xml_string)
+
+          self.assertEqual(feed.title, """New York Times""")
+     #+END_SRC 
    
-** Unit Tests
+** Parser Unit Tests
    #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
      import unittest
      import xml.etree.ElementTree as ET
