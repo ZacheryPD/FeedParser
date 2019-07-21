@@ -1416,3 +1416,24 @@
   #+END_SRC 
 
   #  LocalWords:  unittest org
+* Exception handling
+** Generic type
+  #+BEGIN_SRC python :tangle SimpleRSS.py :noweb yes
+    class SimpleRSSError(Exception):
+        pass
+  #+END_SRC 
+*** Article errors
+  #+BEGIN_SRC python :tangle SimpleRSS.py :noweb yes
+    class ArticleInvalidError(SimpleRSSError):
+        def __init__(self, message = "An error occurred", article = None):
+            self.message = message
+            self.article = article
+
+        def __str__(self):
+            "The article {} was not parsed correctly. \n{} \n{}".format(
+                self.article.title,
+                self.message,
+                self.article
+            )
+
+  #+END_SRC 
