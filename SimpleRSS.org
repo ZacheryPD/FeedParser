@@ -356,6 +356,21 @@
           self.assertEqual(feed.last_build_date, """01/01/19""")
      #+END_SRC 
 **** Title
+     #+BEGIN_SRC python :noexport :tangle :noweb yes :noweb-ref feed-parser-title-exists-test
+       def test_feed_title_build_exists(self):
+          xml_string = """
+          <rss>
+            <channel>
+                <title>New York Times</title>
+            </channel>
+          </rss>
+          """
+          feed_parser = FeedParser()
+
+          feed = feed_parser.parse(xml_string)
+
+          self.assertEqual(feed.title, """New York Times""")
+     #+END_SRC 
    
 ** Parser Unit Tests
    #+BEGIN_SRC python :tangle SimpleRSSTests.py :noweb yes
